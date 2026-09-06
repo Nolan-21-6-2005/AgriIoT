@@ -10,5 +10,13 @@ st.set_page_config(
 if 'role' not in st.session_state:
     st.session_state['role'] = ''
 
+if 'page' not in st.session_state:
+    st.session_state['page'] = 'login'
+
 if st.session_state['page'] == 'login':
     show_sign_in()
+
+elif st.session_state['page'] == 'dashboard':
+    match st.session_state['role']:
+        case 0: show_admin_dashboard()
+        case 1: show_user_dashboard()

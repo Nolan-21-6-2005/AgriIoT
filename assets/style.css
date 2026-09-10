@@ -1,0 +1,161 @@
+/* AgrIoT: small, targeted overrides. Global colors/typography live in config.toml. */
+
+/* App shell */
+[data-testid="stHeader"] {
+    background: rgba(247, 249, 245, 0.92);
+}
+
+[data-testid="stMainBlockContainer"] {
+    padding-top: 1.35rem;
+    padding-bottom: 2.5rem;
+}
+
+/* Buttons */
+.stButton > button,
+.stFormSubmitButton > button {
+    border-radius: 0.55rem;
+    min-height: 2.45rem;
+    font-weight: 600;
+    transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.stButton > button:hover,
+.stFormSubmitButton > button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(31, 41, 55, 0.10);
+}
+
+/* Metrics */
+[data-testid="stMetric"] {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.8rem;
+    padding: 0.85rem 1rem;
+    box-shadow: 0 2px 8px rgba(31, 41, 55, 0.04);
+}
+
+[data-testid="stMetricLabel"] {
+    font-weight: 600;
+}
+
+/* Native bordered containers become the main card primitive. */
+div[data-testid="stVerticalBlockBorderWrapper"] {
+    border-color: #E3E8DF;
+    border-radius: 0.8rem;
+    box-shadow: 0 2px 10px rgba(31, 41, 55, 0.035);
+}
+
+/* Tabs */
+button[data-baseweb="tab"] {
+    font-weight: 600;
+}
+
+/* Dataframes */
+div[data-testid="stDataFrame"] {
+    border: 1px solid #E5E7EB;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+/* Alerts */
+div[data-testid="stAlert"] {
+    border-radius: 0.65rem;
+}
+
+/* Expanders */
+details[data-testid="stExpander"] {
+    border-color: #E5E7EB;
+    border-radius: 0.7rem;
+}
+
+/* Compact mobile behavior without rewriting Streamlit's layout. */
+@media (max-width: 900px) {
+    [data-testid="stMainBlockContainer"] {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* Sidebar navigation: narrow typography, larger visual icons. */
+section[data-testid="stSidebar"] {
+    width: 235px !important;
+}
+
+section[data-testid="stSidebar"] > div:first-child {
+    padding-top: 1.15rem;
+}
+
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3 {
+    margin-bottom: 0.15rem;
+}
+
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
+    margin-bottom: 0.7rem;
+}
+
+/* Native tabs and dialogs use the same visual language as management cards. */
+button[data-baseweb="tab"] {
+    border-radius: 0.55rem 0.55rem 0 0;
+    padding: 0.55rem 0.9rem;
+}
+
+[role="tabpanel"] {
+    background: #FFFFFF;
+    border: 1px solid #E3E8DF;
+    border-radius: 0 0.8rem 0.8rem 0.8rem;
+    padding: 0.8rem;
+}
+
+[data-testid="stDialog"] [data-testid="stVerticalBlockBorderWrapper"] {
+    box-shadow: none;
+}
+
+
+/* Stable management cards: the record body keeps a consistent visual rhythm. */
+[class*="st-key-area_card_"],
+[class*="st-key-crop_card_"],
+[class*="st-key-device_card_"] {
+    min-height: 132px;
+}
+
+
+/* Keep add/action controls aligned with section headings. */
+.management-header {
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+}
+
+/* All native bordered cards use the same white surface. */
+div[data-testid="stVerticalBlockBorderWrapper"] {
+    background: #FFFFFF;
+}
+
+/* Hourly weather cards. */
+[class*="st-key-weather_hour_"] {
+    min-height: 205px;
+}
+.weather-hour-title {
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.1rem;
+}
+.weather-hour-icon {
+    text-align: center;
+    font-size: 2rem;
+    line-height: 1.2;
+}
+.weather-hour-status {
+    text-align: center;
+    min-height: 1.5rem;
+    font-size: 0.82rem;
+    color: #5B6470;
+    margin-bottom: 0.45rem;
+}
+.weather-hour-value {
+    text-align: center;
+    font-size: 0.78rem;
+    line-height: 1.35;
+}
+

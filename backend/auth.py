@@ -1,33 +1,52 @@
 import hashlib
-from pydantic import BaseModel
-from src.database_query.auth import login
+from backend.database import login, signup
 from datetime import datetime
 from fastapi import APIRouter
-import hashlib
+from pydantic import BaseModel
 import traceback
 import re
 
 router = APIRouter()
 
+class LoginRequest(BaseModel):
+    ten_dang_nhap: str
+    password: str
+
+class SignupRequest(BaseModel):
+    ten_dang_nhap: str
+    password: str
+    role: int
+    ho_ten: str
+    ngay_sinh: str
+    gioi_tinh: str
+    email: str
+    so_dien_thoai: str
+    anh_dai_dien: str
+    created_at: str
+    status: int
+
 @router.post("/login")
-def log_in(ten_dang_nhap: str, password: str):
+def log_in(data: LoginRequest):
+    print(">>> ĐÃ VÀO ENDPOINT LOGIN")
+    print(">>> username:", repr(data.ten_dang_nhap))
     try:
         input_hash = hashlib.sha256(
             data.password.encode()
         ).hexdigest()
         
-        user = login(data.professor_id)
+        user = login(data.ten_dang_nhap)
         if not user:
             return {
-            "success": False,
-            "message": "User not found"
+                "success": False,
+                "message": "User not found"
         }
         
         stored_hash = user[2]
+        
         if input_hash == stored_hash:
             return {
                 "success": True,
-                "professor_id": user[1],
+                "ten_dang_nhap": data.ten_dang_nhap,
                 "role": user[3]
             }
         else:
@@ -51,20 +70,8 @@ def is_strong_password(password):
     )
 
 @router.post("/signup")
-def sign_up(professor_id: str,
-    	password: str,
-    	role: int,
-    	ho_ten: str,
-	ngay_sinh: str,
-	gioi_tinh: str,
-	email: str,
-	so_dien_thoai: str,
-	anh_dai_dien: str,
-	created_at: str,
-	status: int
-	):
-    
-try:
+def sign_up(data: SignupRequest):
+    try:
         if is_strong_password(data.password):
         
             password_hash = hashlib.sha256(
@@ -72,7 +79,7 @@ try:
             ).hexdigest()
 
             user = signup(
-                data.professor_id,
+                data.ten_dang_nhap,
                 password_hash,
                 data.role,
                 data.ho_ten,

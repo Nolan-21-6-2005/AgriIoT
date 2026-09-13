@@ -1,6 +1,6 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-
+from streamlit_extras.avatar import *
 from frontend.auth import show_login, show_signup
 from frontend.pages.dashboard import show_dashboard
 from frontend.pages.users import show_users
@@ -16,6 +16,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
 apply_styles()
 
 st.session_state.setdefault("page", "login")
@@ -27,6 +28,8 @@ if st.session_state.page == "login":
     show_login()
 elif st.session_state.page == "signup":
     show_signup()
+elif st.session_state.page == "profile":
+    show_profile()
 else:
     pages = {
         "Dashboard": show_dashboard,
@@ -35,6 +38,7 @@ else:
         "Hồ sơ": show_profile,
         "Cài đặt": show_settings,
     }
+    
     if st.session_state.role == 0:
         pages["Người dùng"] = show_users
 
@@ -46,6 +50,23 @@ else:
         "Hồ sơ": "person",
         "Cài đặt": "gear",
     }
+    
+    with st.container(horizontal_alignment = "right"):
+        role = {
+            0: "Admin",
+            1: "Người dùng",
+        }
+        
+        login_avartar= avatar(
+            "https://avatars.githubusercontent.com/u/1673013?v=4",
+            label=f"{st.session_state.username}",
+            caption=f"{role[st.session_state.role]}",
+            on_click="rerun",
+            key="clickable_avatar",
+        )
+    
+    if login_avartar:
+        st.session_state.page = "profile"
 
     with st.sidebar:
         st.markdown("### 🌱 AgrIoT")
@@ -83,13 +104,5 @@ else:
             },
         )
 
-    top_left, top_right = st.columns([8, 1])
-    with top_left:
-        st.caption(f"Đăng nhập: **{st.session_state.username}**")
-    with top_right:
-        if st.button("Đăng xuất", use_container_width=True):
-            st.session_state.clear()
-            st.session_state.page = "login"
-            st.rerun()
 
     pages[selected]()

@@ -1,13 +1,18 @@
+header {visibility: hidden;}
+[data-testid="stHeader"] {display: none;}
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+[data-testid="stDecoration"] {display: none;}
+
 /* AgrIoT: small, targeted overrides. Global colors/typography live in config.toml. */
+[data-testid="stMainBlockContainer"] {
+    padding-top: 1.35rem;
+    padding-bottom: 2.5rem;
+}
 
 /* App shell */
 [data-testid="stHeader"] {
     background: rgba(247, 249, 245, 0.92);
-}
-
-[data-testid="stMainBlockContainer"] {
-    padding-top: 1.35rem;
-    padding-bottom: 2.5rem;
 }
 
 /* Buttons */
@@ -36,13 +41,6 @@
 
 [data-testid="stMetricLabel"] {
     font-weight: 600;
-}
-
-/* Native bordered containers become the main card primitive. */
-div[data-testid="stVerticalBlockBorderWrapper"] {
-    border-color: #E3E8DF;
-    border-radius: 0.8rem;
-    box-shadow: 0 2px 10px rgba(31, 41, 55, 0.035);
 }
 
 /* Tabs */
@@ -76,6 +74,7 @@ details[data-testid="stExpander"] {
     }
 }
 
+
 /* Sidebar navigation: narrow typography, larger visual icons. */
 section[data-testid="stSidebar"] {
     width: 235px !important;
@@ -100,11 +99,9 @@ button[data-baseweb="tab"] {
 }
 
 [role="tabpanel"] {
-    background: #FFFFFF;
-    border: 1px solid #E3E8DF;
-    border-radius: 0 0.8rem 0.8rem 0.8rem;
     padding: 0.8rem;
 }
+
 
 [data-testid="stDialog"] [data-testid="stVerticalBlockBorderWrapper"] {
     box-shadow: none;
@@ -119,6 +116,33 @@ button[data-baseweb="tab"] {
 }
 
 
+/* Fixed visual rhythm for the map's right-side control stack. */
+.st-key-ai_decision_card {
+    min-height: 355px;
+    border-radius: 16px !important;
+    background: #FFFFFF;
+}
+
+.st-key-irrigation_simulator_card {
+    min-height: 190px;
+    border-radius: 16px !important;
+    background: #FFFFFF;
+}
+
+.st-key-garden_overview,
+.st-key-weather_chart_card,
+.st-key-irrigation_progress_card {
+    height: 100%;
+    min-height: 345px;
+    border-radius: 16px !important;
+    background: #FFFFFF;
+}
+
+.st-key-ai_decision_card [data-testid="stVerticalBlockBorderWrapper"],
+.st-key-irrigation_simulator_card [data-testid="stVerticalBlockBorderWrapper"] {
+    box-shadow: none;
+}
+
 /* Keep add/action controls aligned with section headings. */
 .management-header {
     min-height: 2.5rem;
@@ -126,15 +150,15 @@ button[data-baseweb="tab"] {
     align-items: center;
 }
 
-/* All native bordered cards use the same white surface. */
-div[data-testid="stVerticalBlockBorderWrapper"] {
-    background: #FFFFFF;
-}
+.ai-result-placeholder { height: 76px; width: 100%; }
 
-/* Hourly weather cards. */
 [class*="st-key-weather_hour_"] {
     min-height: 205px;
+    background: #FFFFFF !important;
+    border-radius: 0.8rem;
+    overflow: hidden;
 }
+
 .weather-hour-title {
     text-align: center;
     font-size: 1.05rem;
@@ -159,3 +183,69 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
     line-height: 1.35;
 }
 
+/* Circular daily irrigation progress. */
+.irrigation-progress-wrap {
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.circle-progress {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: conic-gradient(
+        #2E7D32 var(--progress-degree),
+        #E8EEE6 0deg
+    );
+}
+
+.circle-progress-inner {
+    width: 148px;
+    height: 148px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.circle-progress-value {
+    font-size: 1.65rem;
+    font-weight: 750;
+    line-height: 1.1;
+}
+
+.circle-progress-label {
+    font-size: 0.82rem;
+    color: #667085;
+    margin-top: 0.2rem;
+}
+
+.circle-progress-caption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    text-align: center;
+}
+
+.circle-progress-caption span {
+    color: #667085;
+    font-size: 0.84rem;
+}
+
+.st-key-submit_button {
+    margin-top: 26px !important;
+}
+
+.st-key-login_form {
+    margin-left: auto;
+    margin-right: auto;
+}

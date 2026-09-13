@@ -2,7 +2,6 @@
 
 import pandas as pd
 import streamlit as st
-from st_circular_progress import CircularProgress
 
 from frontend.api import request
 
@@ -37,24 +36,33 @@ def _irrigation_progress_card() -> None:
     except Exception as exc:
         st.error(f"Không tải được tiến độ tưới: {exc}")
         return
-    st.subheader("Tiến độ tưới hôm nay")
+
     completed = int(progress.get("completed", 0))
     required = int(progress.get("required", 0))
     percent = int(progress.get("percent", 0))
-    progress = CircularProgress(
-        label=f"{completed}/{required} khu vực · {percent}%",
-        value=percent,
-        key="daily_irrigation_progress",
-        size="Large",
-        track_color="#E8EEE6",
-        color="#2E7D32",
+    degree = percent * 3.6
+
+    st.markdown(
+        f"""
+        <div class="irrigation-progress-wrap">
+            <div class="circle-progress" style="--progress-degree:{degree}deg;">
+                <div class="circle-progress-inner">
+                    <div class="circle-progress-value">{completed}/{required}</div>
+                    <div class="circle-progress-label">khu vực</div>
+                </div>
+            </div>
+            <div class="circle-progress-caption">
+                <b>Tiến độ tưới hôm nay</b>
+                <span>{percent}% hoàn thành yêu cầu</span>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
-    progress.st_circular_progress()
 
 
 @st.fragment(run_every="60s")
 def show_weather() -> None:
-    card_height = 400
     """Render current weather, hourly cards, and the humidity/temperature chart."""
     try:
         data = request("GET", "/api/weather/forecast")
@@ -89,7 +97,7 @@ def show_weather() -> None:
                 hourly["weather_code"][item_index],
             )
 
-    chart_col, progress_col = st.columns([2.4, 1], gap="small")
+    chart_col, progress_col = st.columns([2, 1], gap="small")
     weather_df = pd.DataFrame(
         {
             "Thời gian": times,
@@ -99,10 +107,10 @@ def show_weather() -> None:
     ).set_index("Thời gian")
 
     with chart_col:
-        with st.container(border = True, height = card_height):
+        with st.container(border=True, key="weather_chart_card"):
             st.markdown("#### Nhiệt độ và độ ẩm không khí")
             st.line_chart(weather_df[["Nhiệt độ (°C)", "Độ ẩm không khí (%)"]])
 
     with progress_col:
-        with st.container(border = True, height = card_height):
+        with st.container(border=True, key="irrigation_progress_card", height = 399):
             _irrigation_progress_card()

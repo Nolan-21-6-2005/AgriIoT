@@ -25,10 +25,10 @@ def show_dashboard() -> None:
 
     show_weather()
 
-    with st.container(border=True):
+    with st.container(border=True, key = "garden_overview"):
         st.subheader("Tổng quan khu vườn")
         try:
             map_devices = request("GET", "/api/devices/map")
-            st.plotly_chart(_build_figure(map_devices), use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(_build_figure(map_devices), width='content', config={"displayModeBar": False})
         except Exception as exc:
             st.error(f"Không tải được tổng quan khu vườn: {exc}")

@@ -1,14 +1,24 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
+from ai.predict import predict_irrigation
 from backend.database import execute, fetch_all, fetch_one
 
 router = APIRouter()
 
 
 class IrrigationRequest(BaseModel):
+    temperature: float
+    humidity: float
+    rain: float = 0
+    wind_speed: float = 0
     soil_moisture: float
     device_id: int | None = None
+
+
+@router.post("/predict")
+def predict(data: IrrigationRequest):
+    return predict_irrigation(data.model_dump())
 
 
 @router.get("/logs")
@@ -64,9 +74,13 @@ def daily_progress():
 
 @router.post("/execute")
 def execute_irrigation(data: IrrigationRequest):
+    prediction = predict_irrigation(data.model_dump())
+    if not prediction["irrigation"]:
+        return {"success": True, "message": "AI không yêu cầu tưới", "prediction": prediction}
+
     pump = (
         fetch_one(
-            "SELECT id,duration_seconds FROM Devices WHERE (loai_thiet_bi LIKE '%bơm%' OR loai_thiet_bi LIKE '%pump%') AND trang_thai=1 AND is_deleted=0 ORDER BY id LIMIT 1"
+            "SELECT id,duration_seconds FROM Devices WHERE loai_thiet_bi LIKE '%bơm%' AND trang_thai=1 AND is_deleted=0 ORDER BY id LIMIT 1"
         )
         if data.device_id is None
         else fetch_one(
@@ -75,12 +89,12 @@ def execute_irrigation(data: IrrigationRequest):
         )
     )
     if not pump:
-        return {"success": False, "message": "Không có máy bơm online"}
+        return {"success": False, "message": "Không có máy bơm online", "prediction": prediction}
 
     log_id = execute(
         """INSERT INTO Irrigation_Logs
         (device_id,thoi_gian_tuoi,do_am_dat,trang_thai,ai_decision)
-        VALUES (?,?,?,?,0)""",
+        VALUES (?,?,?,?,1)""",
         (pump["id"], pump["duration_seconds"], data.soil_moisture, 1),
     )
     return {
@@ -88,4 +102,5 @@ def execute_irrigation(data: IrrigationRequest):
         "message": "Đã mô phỏng lệnh tưới",
         "log_id": log_id,
         "duration_seconds": pump["duration_seconds"],
+        "prediction": prediction,
     }

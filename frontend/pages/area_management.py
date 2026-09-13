@@ -141,38 +141,47 @@ def _management_card_grid(items: list[dict], kind: str) -> None:
     for index, item in enumerate(items):
         with columns[index % 3]:
             with st.container(border=True, key=f"{kind}_card_{item['id']}"):
-                content_col, action_col = st.columns([7, 1], gap="small", vertical_alignment="top")
-                with content_col:
-                    if kind == "area":
-                        st.markdown(f"### {item['ten_khu_vuc']}")
-                        st.caption(item.get("mo_ta") or "Không có mô tả")
-                        st.write(f"Diện tích: {item.get('dien_tich', 0):g} m²")
-                        st.write(f"Trạng thái: {item.get('trang_thai', '-')}")
-                    elif kind == "crop":
-                        st.markdown(f"### {item['ten_cay']}")
-                        st.caption(item.get("loai_cay") or "Chưa xác định loại cây")
-                        st.write(f"Khu vực: {item.get('khu_vuc') or '-'}")
-                        st.write(f"Ngày trồng: {item.get('ngay_trong') or '-'}")
-                        st.write(f"Trạng thái: {item.get('trang_thai') or '-'}")
-                    else:
-                        st.markdown(f"### {item['ten_thiet_bi']}")
-                        device_card(item)
-
-                with action_col:
-                    if edit_button(f"edit_{kind}_{item['id']}"):
-                        if kind == "area":
+                if kind == "area":
+                    st.markdown(f"### {item['ten_khu_vuc']}")
+                    st.caption(item.get("mo_ta") or "Không có mô tả")
+                    st.write(f"Diện tích: {item.get('dien_tich', 0):g} m²")
+                    st.write(f"Trạng thái: {item.get('trang_thai', '-')}")
+                    st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
+                    action_cols = st.columns(2, gap="small")
+                    with action_cols[0]:
+                        if edit_button(f"edit_area_{item['id']}"):
                             edit_area_dialog(item)
-                        elif kind == "crop":
-                            edit_crop_dialog(item)
-                        else:
-                            edit_device_dialog(item)
-                    if delete_button(f"delete_{kind}_{item['id']}"):
-                        if kind == "area":
+                    with action_cols[1]:
+                        if delete_button(f"delete_area_{item['id']}"):
                             _delete(f"/api/areas/{item['id']}", "Không thể xóa khu vực")
-                        elif kind == "crop":
+
+                elif kind == "crop":
+                    st.markdown(f"### {item['ten_cay']}")
+                    st.caption(item.get("loai_cay") or "Chưa xác định loại cây")
+                    st.write(f"Khu vực: {item.get('khu_vuc') or '-'}")
+                    st.write(f"Ngày trồng: {item.get('ngay_trong') or '-'}")
+                    st.write(f"Trạng thái: {item.get('trang_thai') or '-'}")
+                    st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
+                    action_cols = st.columns(2, gap="small")
+                    with action_cols[0]:
+                        if edit_button(f"edit_crop_{item['id']}"):
+                            edit_crop_dialog(item)
+                    with action_cols[1]:
+                        if delete_button(f"delete_crop_{item['id']}"):
                             _delete(f"/api/crops/{item['id']}", "Không thể xóa cây trồng")
-                        else:
+
+                else:
+                    st.markdown(f"### {item['ten_thiet_bi']}")
+                    device_card(item)
+                    st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
+                    action_cols = st.columns(2, gap="small")
+                    with action_cols[0]:
+                        if edit_button(f"edit_device_{item['id']}"):
+                            edit_device_dialog(item)
+                    with action_cols[1]:
+                        if delete_button(f"delete_device_{item['id']}"):
                             _delete(f"/api/devices/{item['id']}", "Không thể xóa thiết bị")
+
 
 def show_area_management() -> None:
     """Render the three related master-data interfaces as card views."""
@@ -184,7 +193,7 @@ def show_area_management() -> None:
     with area_tab:
         header, action = st.columns([8, 1])
         header.markdown("#### Cơ sở dữ liệu khu vực")
-        if action.button("Tạo thêm khu vực", icon=":material/add:", help="Tạo thêm khu vực", key="add_area_button", type="primary"):
+        if action.button(" ", icon=":material/add:", help="Thêm khu vực", key="add_area_button", type="primary"):
             add_area_dialog()
         try:
             areas = request("GET", "/api/areas")
@@ -195,7 +204,7 @@ def show_area_management() -> None:
     with crop_tab:
         header, action = st.columns([8, 1])
         header.markdown("#### Quản lý cây trồng")
-        if action.button("Tạo thêm cây trồng", icon=":material/add:", help="Tạo thêm cây trồng", key="add_crop_button", type="primary"):
+        if action.button(" ", icon=":material/add:", help="Thêm cây trồng", key="add_crop_button", type="primary"):
             add_crop_dialog()
         try:
             crops = request("GET", "/api/crops")
@@ -206,7 +215,7 @@ def show_area_management() -> None:
     with device_tab:
         header, action = st.columns([8, 1])
         header.markdown("#### Quản lý thiết bị")
-        if action.button("Tạo thêm thiết bị", icon=":material/add:", help="Tạo thêm thiết bị", key="add_device_button", type="primary"):
+        if action.button(" ", icon=":material/add:", help="Thêm thiết bị", key="add_device_button", type="primary"):
             add_device_dialog()
         try:
             devices = request("GET", "/api/devices")

@@ -62,10 +62,49 @@ def _build_figure(devices):
     return fig
 
 
-def _render_irrigation_simulator(devices):
+def _render_ai_decision(devices):
+    """Render AI prediction immediately above the irrigation simulator."""
+    with st.container(border=True, key="ai_decision_card"):
+        st.markdown("#### Quyết định tưới của AI")
+        st.caption("AI đánh giá điều kiện tưới; phần mô phỏng bên dưới mới thực hiện lệnh cho máy bơm.")
+        cols = st.columns(5)
+        temperature = cols[0].number_input("Nhiệt độ", 0.0, 60.0, 32.0, key="map_ai_temperature")
+        humidity = cols[1].number_input("Độ ẩm không khí", 0.0, 100.0, 60.0, key="map_ai_humidity")
+        rain = cols[2].number_input("Mưa (mm)", 0.0, 100.0, 0.0, key="map_ai_rain")
+        wind = cols[3].number_input("Gió (km/h)", 0.0, 100.0, 10.0, key="map_ai_wind")
+        soil = cols[4].number_input("Độ ẩm đất (%)", 0.0, 100.0, 28.0, key="map_ai_soil")
+
+        if st.button("Dự đoán", type="primary", icon=":material/psychology:", key="map_ai_predict"):
+            try:
+                result = request("POST", "/api/irrigation/predict", json={"temperature": temperature, "humidity": humidity, "rain": rain, "wind_speed": wind, "soil_moisture": soil})
+                st.session_state["map_ai_prediction"] = result
+            except Exception as exc:
+                st.error(str(exc))
+
+        # Reserve the result area so the irrigation simulator below does not jump
+        # when a prediction is produced or replaced.
+        result_slot = st.empty()
+        result = st.session_state.get("map_ai_prediction")
+        with result_slot.container():
+            if result:
+                if result.get("irrigation"):
+                    st.warning("AI: CẦN TƯỚI")
+                else:
+                    st.success("AI: KHÔNG CẦN TƯỚI")
+                confidence = result.get("confidence")
+                if confidence is not None:
+                    st.caption(f"Model: {result.get('model', '-')} • Độ tin cậy: {confidence:.2%}")
+                else:
+                    st.caption(f"Model: {result.get('model', '-')}")
+            else:
+                st.markdown("<div class='ai-result-placeholder' aria-hidden='true'></div>", unsafe_allow_html=True)
+
+        return {"temperature": temperature, "humidity": humidity, "rain": rain, "wind_speed": wind, "soil_moisture": soil}
+
+
+def _render_irrigation_simulator(devices, values):
     with st.container(border=True, key="irrigation_simulator_card"):
         st.markdown("#### Mô phỏng tưới")
-        st.caption("Chọn máy bơm và độ ẩm đất để mô phỏng một lần tưới.")
         pumps = [d for d in devices if "bơm" in d["loai_thiet_bi"].lower() or "pump" in d["loai_thiet_bi"].lower()]
         if not pumps:
             st.info("Chưa có máy bơm để mô phỏng tưới.")
@@ -74,17 +113,19 @@ def _render_irrigation_simulator(devices):
         pump_names = [d["ten_thiet_bi"] for d in pumps]
         pump_name = st.selectbox("Máy bơm", pump_names, key="map_pump")
         pump = next(d for d in pumps if d["ten_thiet_bi"] == pump_name)
-        soil = st.slider("Độ ẩm đất (%)", 0, 100, 28, key="map_sim_soil")
+        soil = st.slider("Độ ẩm đất (%)", 0, 100, int(values["soil_moisture"]), key="map_sim_soil")
+        values = {**values, "soil_moisture": soil, "device_id": pump["id"]}
 
         if st.button("Chạy lệnh tưới", type="primary", icon=":material/water_drop:", key="map_execute_irrigation"):
             try:
-                result = request("POST", "/api/irrigation/execute", json={"soil_moisture": soil, "device_id": pump["id"]})
+                result = request("POST", "/api/irrigation/execute", json=values)
                 if result.get("success"):
                     st.success(f"Đã mô phỏng tưới {result.get('duration_seconds', 0)} giây.")
                 else:
                     st.warning(result.get("message", "Không thể tưới."))
             except Exception as exc:
                 st.error(str(exc))
+
 
 def show_garden_map():
     st.subheader("Bản đồ khu vườn")
@@ -98,8 +139,9 @@ def show_garden_map():
 
     left, right = st.columns([3.2, 1], gap="large")
     with left:
-        with st.container(border=True):
-            st.plotly_chart(_build_figure(devices), use_container_width=True, config={"displayModeBar": False})
+        with st.container(border = True, key = "garden_overview", height = 636):
+            st.plotly_chart(_build_figure(devices), width='content', config={"displayModeBar": False})
 
     with right:
-        _render_irrigation_simulator(devices)
+        values = _render_ai_decision(devices)
+        _render_irrigation_simulator(devices, values)

@@ -3,8 +3,9 @@ uvicorn[standard]
 streamlit>=1.54
 requests
 pandas
+scikit-learn
+joblib
 streamlit-extras>=1.0
 plotly
 streamlit-option-menu
 
-st-circular-progress==0.3.9

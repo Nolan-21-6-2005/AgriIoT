@@ -1,8 +1,4 @@
-header {visibility: hidden;}
-[data-testid="stHeader"] {display: none;}
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-[data-testid="stDecoration"] {display: none;}
+
 
 /* AgrIoT: small, targeted overrides. Global colors/typography live in config.toml. */
 [data-testid="stMainBlockContainer"] {

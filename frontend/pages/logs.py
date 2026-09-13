@@ -6,7 +6,7 @@ from frontend.api import request
 
 def show_logs():
     st.title("Nhật ký tưới")
-    st.caption("Lịch sử các lần tưới và quyết định của hệ thống AI.")
+    st.caption("Lịch sử các lần tưới và quyết định của hệ thống.")
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -48,10 +48,10 @@ def show_logs():
         "thoi_gian_tuoi": "Thời gian (giây)",
         "do_am_dat": "Độ ẩm đất (%)",
         "trang_thai": "Kết quả",
-        "ai_decision": "AI quyết định",
+        "ai_decision": "Quyết định hệ thống",
     })
     if "Kết quả" in df:
         df["Kết quả"] = df["Kết quả"].map({1: "Thành công", 0: "Thất bại"}).fillna("Không rõ")
-    if "AI quyết định" in df:
-        df["AI quyết định"] = df["AI quyết định"].map({1: "Tưới", 0: "Không tưới"}).fillna("Không rõ")
+    if "Quyết định hệ thống" in df:
+        df["Quyết định hệ thống"] = df["Quyết định hệ thống"].map({1: "Tưới", 0: "Không tưới"}).fillna("Không rõ")
     st.dataframe(df, use_container_width=True, hide_index=True)

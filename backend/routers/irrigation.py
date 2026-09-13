@@ -76,7 +76,7 @@ def daily_progress():
 def execute_irrigation(data: IrrigationRequest):
     prediction = predict_irrigation(data.model_dump())
     if not prediction["irrigation"]:
-        return {"success": True, "message": "AI không yêu cầu tưới", "prediction": prediction}
+        return {"success": True, "message": "Hệ thống không khuyến nghị tưới", "prediction": prediction}
 
     pump = (
         fetch_one(

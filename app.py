@@ -28,8 +28,6 @@ if st.session_state.page == "login":
     show_login()
 elif st.session_state.page == "signup":
     show_signup()
-elif st.session_state.page == "profile":
-    show_profile()
 else:
     pages = {
         "Dashboard": show_dashboard,
@@ -66,7 +64,8 @@ else:
         )
     
     if login_avartar:
-        st.session_state.page = "profile"
+        st.session_state.page = "Hồ sơ"
+        st.rerun()
 
     with st.sidebar:
         st.markdown("### 🌱 AgrIoT")
@@ -76,7 +75,8 @@ else:
             None,
             list(pages.keys()),
             icons=[icon_map[name] for name in pages],
-            default_index=0,
+            default_index=list(pages.keys()).index(st.session_state.get("page", "Dashboard"))
+            if st.session_state.get("page", "Dashboard") in pages else 0,
             orientation="vertical",
             styles={
                 "container": {
@@ -105,4 +105,5 @@ else:
         )
 
 
+    st.session_state.page = selected
     pages[selected]()
